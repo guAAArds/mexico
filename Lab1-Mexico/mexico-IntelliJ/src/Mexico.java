@@ -27,11 +27,9 @@ public class Mexico {
 		int pot = 0; // What the winner will get
 		Player[] players; // The players (array of Player objects)
 		Player current; // Current player for round
-		Player leader; // Player starting the round
 		
 		players = getPlayers();
 		current = getRandomPlayer(players);
-		leader  = current;
 
 		out.println("Mexico Game Started");
 		statusMsg(players);
@@ -47,6 +45,7 @@ public class Mexico {
 			Player loser = getLoser(players);
 			if (allRolled(players)) {
 				loser.amount--;
+				pot++;
 				if(loser.amount == 0){
 				    players = removeLoser(players);
 				}
@@ -71,8 +70,6 @@ public class Mexico {
 	}
 
 	// ---- Game logic methods --------------
-
-	// TODO implement and test methods (one at the time)
 
 	boolean allRolled(Player[] ps){
 		for(int i = 0; i < ps.length; i++){
@@ -108,18 +105,12 @@ public class Mexico {
 		}
 		return ps[0];
 	}
-    Player prev(Player[] ps, Player current){
-	if(ps[0] == current){
-	    return ps[ps.length-1]; 
-	}
-	else{
-	    return (ps[indexOf(ps, current) -1]);
-	}
+	
+
+    void rollDice(Player current){
+	current.fstDice = rand.nextInt(6)+1;
+	current.secDice = rand.nextInt(6)+1;
     }
-        void rollDice(Player current){
-	    current.fstDice = rand.nextInt(6)+1;
-	    current.secDice = rand.nextInt(6)+1;
-        }
 
    
     
@@ -158,6 +149,8 @@ public class Mexico {
 			return p1;
 		}
 	}
+
+
 	boolean isDouble(Player p){
 		if (p.fstDice == p.secDice){
 			return true;
@@ -180,15 +173,6 @@ public class Mexico {
 		return players;
 	}
 
-	int indexOf(Player[] players, Player player) {
-		for (int i = 0; i < players.length; i++) {
-			if (players[i] == player) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
 	Player getRandomPlayer(Player[] players) {
 		return players[rand.nextInt(players.length)];
 	}
@@ -196,21 +180,10 @@ public class Mexico {
 	// ---------- IO methods (nothing to do here) -----------------------
 
 	Player[] getPlayers() {
-		// Ugly for now. If using a constructor this may
-		// be cleaned up.
 		Player[] players = new Player[3];
-		Player p1 = new Player();
-		p1.name = "Olle";
-		p1.amount = startAmount;
-		Player p2 = new Player();
-		p2.name = "Fia";
-		p2.amount = startAmount;
-		Player p3 = new Player();
-		p3.name = "Lisa";
-		p3.amount = startAmount;
-		players[0] = p1;
-		players[1] = p2;
-		players[2] = p3;
+		players[0] = new Player("Olle");
+		players[1] = new Player("Fia");
+		players[2] = new Player("Lisa");
 		return players;
 	}
 
@@ -231,13 +204,6 @@ public class Mexico {
 		return sc.nextLine();
 	}
 
-	// Possibly useful utility during development
-	String toString(Player p) {
-		return p.name + ", " + p.amount + ", " + p.fstDice + ", " + p.secDice + ", " + p.nRolls;
-	}
-
-
-
 	// Class for a player
 	class Player {
 		String name;
@@ -245,7 +211,19 @@ public class Mexico {
 		int fstDice; // Result of first dice
 		int secDice; // Result of second dice
 		int nRolls; // Current number of rolls
+
+		public Player(){
+
+		}
+		public Player(String inName){
+			name    = inName;
+			amount  = startAmount;
+			fstDice = 0;
+			secDice = 0;
+			nRolls  = 0;
+		}
 	}
+	
     
 	/**************************************************
 	 * Testing
