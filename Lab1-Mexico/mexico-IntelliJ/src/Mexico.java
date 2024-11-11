@@ -21,9 +21,6 @@ public class Mexico {
 	final int startAmount = 3; // Money for a player. Select any
 	final int mexico = 1000; // A value greater than any other
 
-
-
-    
 	void program() {
 	        //test(); // <----------------- UNCOMMENT to test
 
@@ -42,20 +39,16 @@ public class Mexico {
 		while (players.length > 1) { // Game over when only one player left
 		String cmd = getPlayerChoice(current);
 		if ("r".equals(cmd) && current.nRolls < maxRolls) {
-		        rollDice(current);
+		    rollDice(current);
 			current.nRolls++;
 			roundMsg(current);
 		}
 		else if ("n".equals(cmd)) {
-		    current = next(players, current);
+			Player loser = getLoser(players);
 			if (allRolled(players)) {
-				Player loser = getLoser(players);
+				loser.amount--;
 				if(loser.amount == 0){
 				    players = removeLoser(players);
-				}
-				}
-				else{
-				    loser.amount--;
 				}
 				current = next(players, current);
 				out.println("----------------------------------");
@@ -64,28 +57,31 @@ public class Mexico {
 				out.println("----------------------------------");
 				statusMsg(players);
 				clearRoundResults(players);
+				}
+			else{
+				current = next(players, current);
 			}
+		}
 		else {
 			out.println("?");
 		}
+
+		}
 		out.println("Game Over, winner is " + players[0].name + ". Will get " + pot + " from pot");
-	}
 	}
 
 	// ---- Game logic methods --------------
 
 	// TODO implement and test methods (one at the time)
 
-    boolean allRolled(Player[] ps){
-	for(int i = 0; i < ps.length; i++){
-	    if(ps[i].fstDice == 0){
-		return false;
-	    }
-	}
-	return true;
-    }
-
-
+	boolean allRolled(Player[] ps){
+		for(int i = 0; i < ps.length; i++){
+			if(ps[i].fstDice == 0){
+			return false;
+			}
+		}
+		return true;
+		}
 
     void clearRoundResults(Player[] ps){
 	for(int i = 0; i != ps.length; i++){
@@ -94,33 +90,42 @@ public class Mexico {
 	    ps[i].nRolls  = 0;
 	}
     }
-    int getScore(Player p){
-	if(p.fstDice > p.secDice){
-			return (p.fstDice * 10 + p.secDice);
+	
+	int getScore(Player p){
+		if(p.fstDice > p.secDice){
+				return (p.fstDice * 10 + p.secDice);
+			}
+			else {
+				return (p.secDice * 10 + p.fstDice);
+			}
 		}
-		else {
-			return (p.secDice * 10 + p.fstDice);
-		}
-    }
 
-    Player next(Player[] ps, Player current){
-	int lastIndex = ps.length-1;
-	if(ps[lastIndex] == current){
-	    return ps[0];
+	Player next(Player[] ps, Player current){
+		for(int i = 0; i != ps.length - 1; i++){
+			if(ps[i] == current){
+				return (ps[i+1]);
+			}
+		}
+		return ps[0];
+	}
+    Player prev(Player[] ps, Player current){
+	if(ps[0] == current){
+	    return ps[ps.length-1]; 
 	}
 	else{
-	    return ps[indexOf(ps, current)+1];
+	    return (ps[indexOf(ps, current) -1]);
 	}
     }
+        void rollDice(Player current){
+	    current.fstDice = rand.nextInt(6)+1;
+	    current.secDice = rand.nextInt(6)+1;
+        }
 
-    void rollDice(Player current){
-	current.fstDice = rand.nextInt(6)+1;
-	current.secDice = rand.nextInt(6)+1;
-    }
-
+   
+    
 	Player getLoser(Player[] ps){
 		Player loser = ps[0];
-		for(int i = 0; i < ps.length; i++){
+		for(int i = 0; i != ps.length; i++){
 			loser = getLowest(loser, ps[i]);
 		}
 		return loser;
@@ -138,6 +143,14 @@ public class Mexico {
 		else if (isDouble(p2) && !isDouble(p1)){
 			return p1;
 		}
+		else if(isDouble(p1) && isDouble(p2)){
+			if(p1.fstDice >= p2.fstDice){
+				return p2;
+			}
+			else{
+				return p1;
+			}
+		}
 		else if(getScore(p1) >= getScore(p2)){
 			return p2;
 		}
@@ -145,7 +158,6 @@ public class Mexico {
 			return p1;
 		}
 	}
-
 	boolean isDouble(Player p){
 		if (p.fstDice == p.secDice){
 			return true;
@@ -159,7 +171,7 @@ public class Mexico {
 		Player loser = getLoser(ps);
 		Player[] players = new Player[(ps.length - 1)];
 		int index = 0;
-		for(int i = 0; i != ps.length; i++){
+		for(int i = 0; i < ps.length; i++){
 			if(ps[i] != loser){
 			    players[index] = ps[i];
 			    index++;
@@ -253,7 +265,10 @@ public class Mexico {
 		ps[2].fstDice = 1;
 		ps[2].secDice = 1;
 
-
+		out.println(getScore(ps[0]) == 62);
+		out.println(getScore(ps[1]) == 65);
+		out.println(next(ps, ps[0]) == ps[1]);
+		out.println(getLoser(ps) == ps[0]);
 		
 		exit(0);
 	}
